@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="dom.js"></script>
+    <title>Météo</title>
+
+    <template id="template-previsions">
+        <div id="meteo-content">
+            <h1 id="lieu"></h1>
+            <div class="content-previsions">
+                <div class="date"></div>
+                <div class="temperatures"></div>
+                <div class="condition"></div>
+                <img class="image">
+            </div>
+        </div>
+
+        <script>
+            // Récupération des données
+            let meteoContent = document.querySelector("#previsions").shadowRoot.querySelector("#meteo-content");
+            
+            document.querySelector("#previsions").style.display = "none";
+
+            document.querySelector("#rechercher").addEventListener('click', () => {
+                let ville = document.querySelector("#ville").value;
+                console.log(ville);
+                $.getJSON("https://www.prevision-meteo.ch/services/json/" + ville,
+                    function (data) {
+                        // On replace les données principales recues dans le DOM lorsqu'on a trouvé une ville (Ici je teste en remplaçant simplement le DOM)
+                        let today = data.fcst_day_0;
+                        meteoContent.querySelector("#lieu").innerHTML = ville;
+                        meteoContent.querySelector(".content-previsions").querySelector(".date").innerHTML = today.date
+                        meteoContent.querySelector(".temperatures").innerHTML = 'Entre : ' + today.tmin + '°' + ' et ' + today.tmax + '°';
+                        meteoContent.querySelector(".condition").innerHTML = today.condition;
+                        meteoContent.querySelector(".image").setAttribute("src", today.icon);
+                        $("#liste").children().remove();
+                    });
+                document.querySelector("#previsions").style.display = "block";
+            })
+        </script>
+    </template>
+</head>
+
+<body>
+    <div id="meteo">
+        <form>
+            <fieldset>
+                <label for="ville">Nom de la ville : </label>
+                <input type="text" id="ville" name="ville">
+                <input id="rechercher" type="button" value="Rechercher">
+            </fieldset>
+        </form>
+        
+        <prevision-element id="previsions"></prevision-element>
+    </div>
+</body>
+
+</html>
